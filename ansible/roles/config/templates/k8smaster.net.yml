@@ -2,7 +2,7 @@ network:
   ethernets:
     ens18:
       addresses:
-      - {{  }}
+      - 172.16.10.26
       gateway: 172.16.10.1
       nameservers:
         addresses:

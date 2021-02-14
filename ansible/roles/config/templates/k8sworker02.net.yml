@@ -1,0 +1,12 @@
+network:
+  ethernets:
+    ens18:
+      addresses:
+      - 172.16.10.28
+      gateway: 172.16.10.1
+      nameservers:
+        addresses:
+        - 172.16.10.1
+        search:
+        - rushd.serv
+  version: 2
