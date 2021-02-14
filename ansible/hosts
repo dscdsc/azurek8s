@@ -1,0 +1,10 @@
+[proxmox]
+pvetwo ansible_ssh_host=172.16.10.13 ansible_ssh_user=root
+
+[iptemplate]
+172.16.10.19 ansible_ssh_user=root
+
+[k8svms]
+k8smaster     ansible_ssh_host=172.16.10.26 ansible_ssh_user=root
+k8sworker01   ansible_ssh_host=172.16.10.27 ansible_ssh_user=root
+k8sworker02   ansible_ssh_host=172.16.10.28 ansible_ssh_user=root
