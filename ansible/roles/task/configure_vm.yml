@@ -1,3 +1,0 @@
-- hosts: 
-  tasks:
-    - name: Configuración de IP para la VMs

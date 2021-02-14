@@ -1,0 +1,4 @@
+clustervms: 
+  - k8smaster
+  - k8sworker01
+  - k8sworker02
