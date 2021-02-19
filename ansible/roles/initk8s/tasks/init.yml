@@ -1,0 +1,79 @@
+- name: Descarga de imagenes para desplegar k8s
+  shell: |
+    kubeadm config images pull
+
+- name: Iniciar el nodo master de k8s
+  shell: |
+    kubeadm init --pod-network-cidr={{ pod_cidr }}
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Crear entorno - directorio
+  file:
+    path: /root/.kube
+    state: directory
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Crear entorno - config
+  shell: |
+    cp /etc/kubernetes/admin.conf /root/.kube/config
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Instalar flannel para k8s - copia fichero
+  template:
+    src: kube-flannel.yml.j2
+    dest: /root/kube-flannel.yml
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Instalar flannel para k8s
+  shell: |
+    kubectl apply -f /home/k8s/kube-flannel.yml
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Obtener token para workers k8s
+  shell: |
+    kubeadm token create > /var/www/html/token
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Obtener Discovery Key para worker k8s
+  shell: |
+    openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //' > /var/www/html/key
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Introducir worker01 al cluster k8s
+  shell: |
+    kubeadm join --token $(curl -sb -H "Accept: application/text" http://172.16.10.26/token) --discovery-token-ca-cert-hash sha256:$(curl -sb -H "Accept: application/text" http://172.16.10.26/key) 172.16.10.26:6443
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.27"
+
+- name: Introducir worker02 al cluster k8s
+  shell: |
+    kubeadm join --token $(curl -sb -H "Accept: application/text" http://172.16.10.26/token) --discovery-token-ca-cert-hash sha256:$(curl -sb -H "Accept: application/text" http://172.16.10.26/key)  172.16.10.26:6443
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.28"
+
+- name: Descargar rook con Ceph en el cluster k8s
+  git:
+    repo: https://github.com/rook/rook.git
+    dest: /root/rook
+    version: v1.5.7
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Instalar rook con Ceph en el cluster k8s - fase 1
+  shell: |
+    kubectl create -f /root/rook/cluster/examples/kubernetes/ceph/crds.yaml -f /root/rook/cluster/examples/kubernetes/ceph/common.yaml -f /root/rook/cluster/examples/kubernetes/ceph/operator.yaml
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Instalar rook con Ceph en el cluster k8s - fase 1
+  shell: |
+    kubectl create -f /root/rook/cluster/examples/kubernetes/ceph/cluster.yaml
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"

@@ -1,0 +1,29 @@
+- name: Configurando hostnames
+  become: yes
+  hostname:
+    name="{{ item.host }}"
+  when:
+    ansible_ens18.ipv4.address == item.ip
+
+- name: Configuracion de repositorio Docker
+  become: yes
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+  when:
+    ansible_ens18.ipv4.address == item.ip
+
+- name: Configuracion de repositorio K8S
+  become: yes
+  copy:
+    src: roles/config/templates/kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+  when:
+    ansible_ens18.ipv4.address == item.ip
+
+- name: Actualización de DB de Repositorios
+  become: yes
+  yum:
+    update_cache: yes
+  when:
+    ansible_ens18.ipv4.address == item.ip

@@ -1,0 +1,44 @@
+- name: Instalar Docker y Kubernetes
+  become: yes
+  dnf:
+    name: 
+      - docker-ce
+      - kubeadm
+      - kubectl
+      - kubelet
+    state: present
+    disable_excludes: all
+
+- name: Habilitar Docker
+  become: yes
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Habilitar Kubelet
+  become: yes
+  systemd:
+    name: kubelet
+    state: started
+    enabled: yes
+
+- name: Instalar HTTPD y GIT en kubemaster
+  become: yes
+  dnf:
+    name:
+      - httpd
+      - git
+    state: present
+    disable_excludes: all
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Activar HTTPD en kubemaster
+  become: yes
+  systemd:
+    name: httpd
+    state: started
+    enabled: yes
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"

@@ -1,0 +1,7 @@
+- name: Crear VMs en Proxmox
+  hosts: proxmox
+  vars_files:
+    - "group_vars/vars.yml"
+  gather_facts: true
+  roles:
+    - create

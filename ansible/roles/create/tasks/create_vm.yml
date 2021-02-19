@@ -1,0 +1,17 @@
+- name : Crear VMs
+  community.general.proxmox_kvm:
+    api_user: "{{ proxmox_user }}"
+    api_password: "{{ proxmox_pass }}"
+    api_host: "{{ proxmox_host }}"
+    name: "{{ item.host }}"
+    node: pvetwo
+    clone: templatek8sc
+    net:
+      net0: 'virtio,bridge=vmbr0'
+    virtio:
+      virtio0: 'VMs_LVM:100'
+    cores: 2
+    vcpus: 2
+    memory: 8192
+    timeout: 600
+  loop: "{{ clustervms }}"

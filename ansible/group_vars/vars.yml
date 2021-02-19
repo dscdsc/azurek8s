@@ -1,4 +1,8 @@
 clustervms: 
-  - k8smaster
-  - k8sworker01
-  - k8sworker02
+  - { host: 'k8smaster', ip: '172.16.10.26' }
+  - { host: 'k8sworker01', ip: '172.16.10.27' }
+  - { host: 'k8sworker02', ip: '172.16.10.28' }
+proxmox_user: root@pam
+proxmox_pass: yosoyasi12.
+proxmox_host: pvetwo
+pod_cidr: '10.244.0.0/16'

@@ -1,0 +1,7 @@
+- name: Instalar Paqueteria en VMs
+  hosts: k8svms
+  vars_files:
+    - "group_vars/vars.yml"
+  gather_facts: true
+  roles:
+    - install
