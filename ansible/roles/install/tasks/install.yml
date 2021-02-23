@@ -39,6 +39,26 @@
   systemd:
     name: httpd
     state: started
-    enabled: yes
+    enabled: no
   when:
     ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Configurar Zona horaria
+  become: yes
+  shell: |
+    timedatectl set-timezone Europe/Madrid
+    
+- name: Instalar Chrony
+  become: yes
+  dnf:
+    name:
+      - chrony
+    state: present
+    disable_excludes: all
+
+- name: Activar Chrony
+  become: yes
+  systemd:
+    name: chronyd
+    state: started
+    enabled: yes

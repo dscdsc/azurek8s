@@ -1,0 +1,17 @@
+- name: Sincronizar datos para rook en k8s
+  copy:
+    src: roles/game/files
+    dest: /root/
+    directory_mode: yes
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Pausar 5 min para que se despliegue rook
+  pause:
+    minutes: 5
+
+- name: Desplegar aplicación Game 2048 bajo ingress
+  shell: |
+    kubectl apply -f /root/files/game.yml
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"

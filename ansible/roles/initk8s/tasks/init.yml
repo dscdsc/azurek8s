@@ -21,16 +21,25 @@
   when:
     ansible_ens18.ipv4.address == "172.16.10.26"
 
-- name: Instalar flannel para k8s - copia fichero
+- name: Instalar calico para k8s - copia fichero
   template:
-    src: kube-flannel.yml.j2
-    dest: /root/kube-flannel.yml
+    src: calico.yml.j2
+    dest: /root/calico.yml
   when:
     ansible_ens18.ipv4.address == "172.16.10.26"
 
-- name: Instalar flannel para k8s
+- name: Instalar calico para k8s
   shell: |
-    kubectl apply -f /home/k8s/kube-flannel.yml
+    kubectl apply -f /root/calico.yml
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Activar HTTPD en kubemaster
+  become: yes
+  systemd:
+    name: httpd
+    state: started
+    enabled: no
   when:
     ansible_ens18.ipv4.address == "172.16.10.26"
 
@@ -58,22 +67,55 @@
   when:
     ansible_ens18.ipv4.address == "172.16.10.28"
 
-- name: Descargar rook con Ceph en el cluster k8s
-  git:
-    repo: https://github.com/rook/rook.git
-    dest: /root/rook
-    version: v1.5.7
+- name: Desactivar HTTPD en kubemaster
+  become: yes
+  systemd:
+    name: httpd
+    state: stopped
+    enabled: no
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Permitir aceptar pods en k8smaster
+  shell: |
+    kubectl taint node k8smaster node-role.kubernetes.io/master:NoSchedule-
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Sincronizar datos para rook en k8s
+  copy:
+    src: roles/initk8s/files
+    dest: /root/
+    directory_mode: yes
   when:
     ansible_ens18.ipv4.address == "172.16.10.26"
 
 - name: Instalar rook con Ceph en el cluster k8s - fase 1
   shell: |
-    kubectl create -f /root/rook/cluster/examples/kubernetes/ceph/crds.yaml -f /root/rook/cluster/examples/kubernetes/ceph/common.yaml -f /root/rook/cluster/examples/kubernetes/ceph/operator.yaml
+    kubectl create -f /root/files/crds.yaml -f /root/files/common.yaml -f /root/files/operator.yaml 
   when:
     ansible_ens18.ipv4.address == "172.16.10.26"
 
-- name: Instalar rook con Ceph en el cluster k8s - fase 1
+- name: Instalar rook con Ceph en el cluster k8s - fase 2
   shell: |
-    kubectl create -f /root/rook/cluster/examples/kubernetes/ceph/cluster.yaml
+    kubectl create -f /root/files/cluster.yaml
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Instalar Toolbox de Rook
+  shell: |
+    kubectl create -f /root/files/toolbox.yaml
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"  
+
+- name: Instalar rook con Ceph en el cluster k8s - fase Storageclass
+  shell: |
+    kubectl create -f /root/files/storageclass.yaml
+  when:
+    ansible_ens18.ipv4.address == "172.16.10.26"
+
+- name: Instalar Haproxy-Ingress 
+  shell: |
+    kubectl create -f /root/files/haproxy-ingress.yaml
   when:
     ansible_ens18.ipv4.address == "172.16.10.26"

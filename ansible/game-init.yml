@@ -1,7 +1,8 @@
-- name: Configurar VMs en Azure
+- name: Instalar Game 2048 en K8s
+  become: yes
   hosts: k8svms
   vars_files:
     - "group_vars/vars.yml"
   gather_facts: true
   roles:
-    - config
+    - game

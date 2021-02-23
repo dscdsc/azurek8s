@@ -64,3 +64,4 @@
 - name: Cargar las reglas de Firewalld
   shell: |
     firewall-cmd --reload
+  

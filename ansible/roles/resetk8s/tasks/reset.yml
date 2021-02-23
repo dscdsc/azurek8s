@@ -1,0 +1,7 @@
+- name: Resetear cluster k8s
+  shell: |
+    kubeadm reset -f
+
+- name: Limpiando ficheros
+  shell: |
+    rm -rf /var/lib/rook/* /var/lib/kubelet/plugins/* /var/lib/kubelet/plugins_registry/*

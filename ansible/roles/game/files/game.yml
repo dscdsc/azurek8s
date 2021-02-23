@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: game
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: game-pvc
+  namespace: game
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-service
+  namespace: game
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: game
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game
+  namespace: game
+  labels:
+    app: game
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: game
+  template:
+    metadata:
+      labels:
+        app: game
+    spec:
+      containers:
+      - name: game
+        image: almansur/game2048:1.4
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - mountPath: /var/lib/nginx/html
+            name: site-pvc
+      volumes:
+      - name: site-pvc
+        persistentVolumeClaim:
+          claimName: game-pvc
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: game-ingress
+  namespace: game
+spec:
+  rules:
+  - host: game.rushd.serv
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: game-service
+            port:
+              number: 80
