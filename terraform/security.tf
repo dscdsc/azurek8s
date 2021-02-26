@@ -1,63 +1,17 @@
 
 resource "azurerm_network_security_group" "masterSecGroup" {
-    name                = "sshtrfk8sm"
+    name                = "masterports"
     location            = azurerm_resource_group.rg.location
     resource_group_name = azurerm_resource_group.rg.name
 
     security_rule {
-        name                       = "SSH"
+        name                       = "ListPorts"
         priority                   = 1001
         direction                  = "Inbound"
         access                     = "Allow"
         protocol                   = "Tcp"
         source_port_range          = "*"
-        destination_port_range     = "22"
-        source_address_prefix      = "*"
-        destination_address_prefix = "*"
-    }
-
-    tags = {
-        environment = "CP2"
-    }
-}
-
-
-resource "azurerm_network_security_group" "masterHttpGroup" {
-    name                = "httptrfk8sm"
-    location            = azurerm_resource_group.rg.location
-    resource_group_name = azurerm_resource_group.rg.name
-
-    security_rule {
-        name                       = "HTTP"
-        priority                   = 1002
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "80"
-        source_address_prefix      = "*"
-        destination_address_prefix = "*"
-    }
-
-    tags = {
-        environment = "CP2"
-    }
-}
-
-
-resource "azurerm_network_security_group" "masterHttpsGroup" {
-    name                = "httpstrfk8sm"
-    location            = azurerm_resource_group.rg.location
-    resource_group_name = azurerm_resource_group.rg.name
-
-    security_rule {
-        name                       = "HTTPS"
-        priority                   = 1003
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "443"
+        destination_port_ranges     = [22,80,443,6443]
         source_address_prefix      = "*"
         destination_address_prefix = "*"
     }
@@ -73,20 +27,8 @@ resource "azurerm_network_interface_security_group_association" "masterSecGroupA
 
 }
 
-resource "azurerm_network_interface_security_group_association" "masterHttpGroupAssociation" {
-    network_interface_id      = azurerm_network_interface.myPublicIp1.id
-    network_security_group_id = azurerm_network_security_group.masterHttpGroup.id
-
-}
-
-resource "azurerm_network_interface_security_group_association" "masterHttpsGroupAssociation" {
-    network_interface_id      = azurerm_network_interface.myPublicIp1.id
-    network_security_group_id = azurerm_network_security_group.masterHttpsGroup.id
-
-}
-
 resource "azurerm_network_security_group" "worker1SecGroup" {
-    name                = "sshtrfk8sw1"
+    name                = "worker1ports"
     location            = azurerm_resource_group.rg.location
     resource_group_name = azurerm_resource_group.rg.name
 
@@ -97,7 +39,7 @@ resource "azurerm_network_security_group" "worker1SecGroup" {
         access                     = "Allow"
         protocol                   = "Tcp"
         source_port_range          = "*"
-        destination_port_range     = "22"
+        destination_port_ranges     = [22,6443]
         source_address_prefix      = "*"
         destination_address_prefix = "*"
     }
@@ -114,7 +56,7 @@ resource "azurerm_network_interface_security_group_association" "worker1SecGroup
 }
 
 resource "azurerm_network_security_group" "worker2SecGroup" {
-    name                = "sshtrfk8sw2"
+    name                = "worker2ports"
     location            = azurerm_resource_group.rg.location
     resource_group_name = azurerm_resource_group.rg.name
 
@@ -125,7 +67,7 @@ resource "azurerm_network_security_group" "worker2SecGroup" {
         access                     = "Allow"
         protocol                   = "Tcp"
         source_port_range          = "*"
-        destination_port_range     = "22"
+        destination_port_ranges    = [22,6443]
         source_address_prefix      = "*"
         destination_address_prefix = "*"
     }
