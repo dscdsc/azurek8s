@@ -1,17 +1,24 @@
-- name: Sincronizar datos para rook en k8s
+## Copiamos los ficheros necesarios para desplegar la aplicación.
+
+- name: Sincronizar datos para aplicación en k8s
   copy:
     src: roles/game/files
     dest: /root/
     directory_mode: yes
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
 
-- name: Pausar 5 min para que se despliegue rook
+## Esperamos 15 min hasta que se haya desplegado correctamente
+## el cluster rook-ceph
+
+- name: Pausar 15 min para que se despliegue rook
   pause:
-    minutes: 5
+    minutes: 15
+
+## Desplegar la aplicación Game 2048 con su ingress
 
 - name: Desplegar aplicación Game 2048 bajo ingress
   shell: |
     kubectl apply -f /root/files/game.yml
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"

@@ -1,11 +1,4 @@
 [k8svms]
-k8smaster     ansible_ssh_host=172.16.10.26 ansible_ssh_user=k8s  ansible_sudo_pass=danielin12.
-k8sworker01   ansible_ssh_host=172.16.10.27 ansible_ssh_user=k8s ansible_sudo_pass=danielin12.
-k8sworker02   ansible_ssh_host=172.16.10.28 ansible_ssh_user=k8s ansible_sudo_pass=danielin12.
-
-[master]
-k8smaster     ansible_ssh_host=172.16.10.26 ansible_ssh_user=k8s ansible_sudo_pass=danielin12.
-
-[workers]
-k8sworker01   ansible_ssh_host=172.16.10.27 ansible_ssh_user=k8s ansible_sudo_pass=danielin12.
-k8sworker02   ansible_ssh_host=172.16.10.28 ansible_ssh_user=k8s ansible_sudo_pass=danielin12.
+k8smaster     ansible_ssh_host=23.97.177.6 ansible_ssh_user=k8s
+k8sworker01   ansible_ssh_host=104.40.222.70 ansible_ssh_user=k8s
+k8sworker02   ansible_ssh_host=51.144.237.2 ansible_ssh_user=k8s

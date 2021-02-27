@@ -209,9 +209,7 @@ spec:
     run: haproxy-ingress
   type: NodePort
   externalIPs:
-    - 172.16.10.26
-    - 172.16.10.27
-    - 172.16.10.28
+    - 10.0.1.10
   ports:
   - name: http
     port: 80

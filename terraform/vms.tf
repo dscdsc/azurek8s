@@ -1,8 +1,10 @@
+## Creación de VM k8smaster, nodo master del cluster k8s
+
 resource "azurerm_linux_virtual_machine" "k8sMaster" {
     name                = "k8smaster"
     resource_group_name = azurerm_resource_group.rg.name
     location            = azurerm_resource_group.rg.location
-    size                = var.vm_size
+    size                = "Standard_D2_v2"
     admin_username      = "k8s"
     network_interface_ids = [ azurerm_network_interface.myPublicIp1.id ]
     disable_password_authentication = true
@@ -39,6 +41,8 @@ resource "azurerm_linux_virtual_machine" "k8sMaster" {
     }
 
 }
+
+## Creación de VM k8sworker01, nodo worker del cluster k8s
 
 resource "azurerm_linux_virtual_machine" "k8sWorker1" {
     name                = "k8sworker01"
@@ -79,8 +83,9 @@ resource "azurerm_linux_virtual_machine" "k8sWorker1" {
     tags = {
         environment = "CP2"
     }
-
 }
+
+## Creación de VM k8sworker02, nodo worker del cluster k8s
 
 resource "azurerm_linux_virtual_machine" "k8sWorker2" {
     name                = "k8sworker02"

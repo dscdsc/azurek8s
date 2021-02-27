@@ -1,9 +1,16 @@
+
+## Configuramos cada nodo con un nombre de host,
+## el master k8smaster, y los workers k8sworker01 y k8sworker02
+
 - name: Configurando hostnames
   become: yes
   hostname:
     name="{{ item.host }}"
   when:
-    ansible_ens18.ipv4.address == item.ip
+    ansible_eth0.ipv4.address == item.ipin
+
+## Configuramos el repositorio para instalar docker posteriormente 
+## en todos los nodos
 
 - name: Configuracion de repositorio Docker
   become: yes
@@ -11,7 +18,10 @@
     url: https://download.docker.com/linux/centos/docker-ce.repo
     dest: /etc/yum.repos.d/docker-ce.repo
   when:
-    ansible_ens18.ipv4.address == item.ip
+    ansible_eth0.ipv4.address == item.ipin
+
+## COnfiguramos el repositorio para instalar kubernetes posteriormente
+## en todo los nodos
 
 - name: Configuracion de repositorio K8S
   become: yes
@@ -19,11 +29,14 @@
     src: roles/config/templates/kubernetes.repo
     dest: /etc/yum.repos.d/kubernetes.repo
   when:
-    ansible_ens18.ipv4.address == item.ip
+    ansible_eth0.ipv4.address == item.ipin
+
+## Actualizamos la base de datos de repositorios, para tener disponibles
+## los paquetes en el playbook de instalación
 
 - name: Actualización de DB de Repositorios
   become: yes
   yum:
     update_cache: yes
   when:
-    ansible_ens18.ipv4.address == item.ip
+    ansible_eth0.ipv4.address == item.ipin

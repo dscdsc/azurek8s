@@ -1,3 +1,6 @@
+## Instalamos todos los paquetes necesarios para
+## realizar el cluster de kubernetes
+
 - name: Instalar Docker y Kubernetes
   become: yes
   dnf:
@@ -9,6 +12,9 @@
     state: present
     disable_excludes: all
 
+## Iniciamos y habilitamos el servicio de Docker en el 
+## inico de la VM
+
 - name: Habilitar Docker
   become: yes
   systemd:
@@ -16,12 +22,18 @@
     state: started
     enabled: yes
 
+## Iniciamos y habilitamos el servicio de Kubelet en el 
+## inico de la VM
+
 - name: Habilitar Kubelet
   become: yes
   systemd:
     name: kubelet
     state: started
     enabled: yes
+
+## Instalamos sevidor HTTPD en nodo Master para 
+## luego compartir la key y el token para los nodos worker
 
 - name: Instalar HTTPD y GIT en kubemaster
   become: yes
@@ -32,7 +44,9 @@
     state: present
     disable_excludes: all
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Activamos el demonio HTTPD en nodo Master
 
 - name: Activar HTTPD en kubemaster
   become: yes
@@ -41,13 +55,17 @@
     state: started
     enabled: no
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Configuramos la zona horaria
 
 - name: Configurar Zona horaria
   become: yes
   shell: |
     timedatectl set-timezone Europe/Madrid
     
+## Instalamos demonio de tiempo, para sincronizar la fecha
+
 - name: Instalar Chrony
   become: yes
   dnf:
@@ -55,6 +73,8 @@
       - chrony
     state: present
     disable_excludes: all
+
+## Activamos el demonio de tiempo en el inicio
 
 - name: Activar Chrony
   become: yes

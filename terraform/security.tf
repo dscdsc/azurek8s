@@ -1,3 +1,4 @@
+## Regla de apertura de puertos para el nodo master k8smaster
 
 resource "azurerm_network_security_group" "masterSecGroup" {
     name                = "masterports"
@@ -27,13 +28,15 @@ resource "azurerm_network_interface_security_group_association" "masterSecGroupA
 
 }
 
+## Regla de apertura de puertos para el nodo worker k8sworker01
+
 resource "azurerm_network_security_group" "worker1SecGroup" {
     name                = "worker1ports"
     location            = azurerm_resource_group.rg.location
     resource_group_name = azurerm_resource_group.rg.name
 
     security_rule {
-        name                       = "SSH"
+        name                       = "ListPorts"
         priority                   = 1001
         direction                  = "Inbound"
         access                     = "Allow"
@@ -55,13 +58,15 @@ resource "azurerm_network_interface_security_group_association" "worker1SecGroup
 
 }
 
+## Regla de apertura de puertos para el nodo worker k8sworker02
+
 resource "azurerm_network_security_group" "worker2SecGroup" {
     name                = "worker2ports"
     location            = azurerm_resource_group.rg.location
     resource_group_name = azurerm_resource_group.rg.name
 
     security_rule {
-        name                       = "SSH"
+        name                       = "ListPorts"
         priority                   = 1001
         direction                  = "Inbound"
         access                     = "Allow"

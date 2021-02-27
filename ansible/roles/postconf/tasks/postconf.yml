@@ -1,67 +1,73 @@
-- name: Desabilitando Swap 
-  shell: |
-    swapoff -a
+### TODOS LOS APARTADOS QUE ESTÁN COMENTADOS
+### SON PERTENECIENTES A LAS VMS QUE TENIA
+### CONFIGURADAS EN LOCAL
 
-- name: Deshabilitando Swap en fstab
-  replace:
-    path: /etc/fstab
-    regexp: '^([^#].*?\sswap\s+swap\s+.*)$'
-    replace: '# \1'
+# - name: Desabilitando Swap 
+#   shell: |
+#     swapoff -a
+
+# - name: Deshabilitando Swap en fstab
+#   replace:
+#     path: /etc/fstab
+#     regexp: '^([^#].*?\sswap\s+swap\s+.*)$'
+#     replace: '# \1'
+
+## Desactivamos Selinux
 
 - name: Desactivar Selinux
   selinux:
     state: disabled
 
-- name: Cargando modulo Netfliter
-  modprobe:
-    name: br_netfilter
-    state: present
+# - name: Cargando modulo Netfliter
+#   modprobe:
+#     name: br_netfilter
+#     state: present
 
-- name: Permitiendo Masquerade
-  ansible.posix.firewalld:
-    masquerade: yes
-    permanent: yes
-    state: enabled
-    zone: public
+# - name: Permitiendo Masquerade
+#   ansible.posix.firewalld:
+#     masquerade: yes
+#     permanent: yes
+#     state: enabled
+#     zone: public
 
-- name: Modificando iptables para permitir trafico
-  copy:
-    src: roles/postconf/templates/k8s.conf
-    dest: /etc/sysctl.d/k8s.conf
+# - name: Modificando iptables para permitir trafico
+#   copy:
+#     src: roles/postconf/templates/k8s.conf
+#     dest: /etc/sysctl.d/k8s.conf
 
-- name: Aplicando cambios en Sysctl
-  shell: |
-    sysctl --system
+# - name: Aplicando cambios en Sysctl
+#   shell: |
+#     sysctl --system
 
-- name: Abriendo puertos K8S
-  ansible.posix.firewalld:
-    zone: public
-    permanent: yes
-    port: "{{ item }}" 
-    state: enabled
-  loop:
-    - 6443/tcp
-    - 2370/tcp
-    - 2380/tcp
-    - 10250/tcp
-    - 10251/tcp
-    - 10252/tcp
+# - name: Abriendo puertos K8S
+#   ansible.posix.firewalld:
+#     zone: public
+#     permanent: yes
+#     port: "{{ item }}" 
+#     state: enabled
+#   loop:
+#     - 6443/tcp
+#     - 2370/tcp
+#     - 2380/tcp
+#     - 10250/tcp
+#     - 10251/tcp
+#     - 10252/tcp
 
-- name: Creando reglas de trafico para Docker
-  ansible.posix.firewalld:
-    zone: public
-    permanent: yes
-    rich_rule: 'rule family=ipv4 source address=172.17.0.0/16 accept'
-    state: enabled
+# - name: Creando reglas de trafico para Docker
+#   ansible.posix.firewalld:
+#     zone: public
+#     permanent: yes
+#     rich_rule: 'rule family=ipv4 source address=10.0.0.0.0/16 accept'
+#     state: enabled
 
-- name: Permitiendo acceso a cada Nodo
-  ansible.posix.firewalld:
-    zone: public
-    permanent: yes
-    rich_rule: 'rule family=ipv4 source address={{ ansible_ens18.ipv4.address }}/24 accept'
-    state: enabled
+# - name: Permitiendo acceso a cada Nodo
+#   ansible.posix.firewalld:
+#     zone: public
+#     permanent: yes
+#     rich_rule: 'rule family=ipv4 source address={{ ansible_eth0.ipv4.address }}/24 accept'
+#     state: enabled
 
-- name: Cargar las reglas de Firewalld
-  shell: |
-    firewall-cmd --reload
+# - name: Cargar las reglas de Firewalld
+#   shell: |
+#     firewall-cmd --reload
   

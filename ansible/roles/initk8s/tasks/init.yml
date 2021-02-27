@@ -1,38 +1,49 @@
+## Nos descargamos las imagenenes de docker 
+## necesarias para el cluster de kubernetes
+
 - name: Descarga de imagenes para desplegar k8s
   shell: |
     kubeadm config images pull
+
+## Iniciamos el nodo master y lo preparamos para el cluster
 
 - name: Iniciar el nodo master de k8s
   shell: |
     kubeadm init --pod-network-cidr={{ pod_cidr }}
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Creamos el entorno para poder controlar el cluster con kubectl
 
 - name: Crear entorno - directorio
   file:
     path: /root/.kube
     state: directory
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
 
 - name: Crear entorno - config
   shell: |
     cp /etc/kubernetes/admin.conf /root/.kube/config
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Instalamos la red Calico para el cluster de kubernetes
 
 - name: Instalar calico para k8s - copia fichero
   template:
     src: calico.yml.j2
     dest: /root/calico.yml
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
 
 - name: Instalar calico para k8s
   shell: |
     kubectl apply -f /root/calico.yml
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Activamos de nuevo HTTPD, por si no estuviera ya activado
 
 - name: Activar HTTPD en kubemaster
   become: yes
@@ -41,31 +52,47 @@
     state: started
     enabled: no
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Generamos un token en el nodo master y lo guardamos 
+## en la ruta web del demonio HTTPD
 
 - name: Obtener token para workers k8s
   shell: |
     kubeadm token create > /var/www/html/token
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Generamos la key en el nodo master y la guardamos 
+## en la ruta web del demonio HTTPD
 
 - name: Obtener Discovery Key para worker k8s
   shell: |
     openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //' > /var/www/html/key
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Conectamos el nodo worker01 con el master, cogiendo
+## el token y la key desde el demonio HTTPD del nodo master
 
 - name: Introducir worker01 al cluster k8s
   shell: |
-    kubeadm join --token $(curl -sb -H "Accept: application/text" http://172.16.10.26/token) --discovery-token-ca-cert-hash sha256:$(curl -sb -H "Accept: application/text" http://172.16.10.26/key) 172.16.10.26:6443
+    kubeadm join --token $(curl -sb -H "Accept: application/text" http://10.0.1.10/token) --discovery-token-ca-cert-hash sha256:$(curl -sb -H "Accept: application/text" http://10.0.1.10/key) 10.0.1.10:6443
   when:
-    ansible_ens18.ipv4.address == "172.16.10.27"
+    ansible_eth0.ipv4.address == "10.0.1.11"
+
+## Conectamos el nodo worker02 con el master, cogiendo
+## el token y la key desde el demonio HTTPD del nodo master
 
 - name: Introducir worker02 al cluster k8s
   shell: |
-    kubeadm join --token $(curl -sb -H "Accept: application/text" http://172.16.10.26/token) --discovery-token-ca-cert-hash sha256:$(curl -sb -H "Accept: application/text" http://172.16.10.26/key)  172.16.10.26:6443
+    kubeadm join --token $(curl -sb -H "Accept: application/text" http://10.0.1.10/token) --discovery-token-ca-cert-hash sha256:$(curl -sb -H "Accept: application/text" http://10.0.1.10/key)  10.0.1.10:6443
   when:
-    ansible_ens18.ipv4.address == "172.16.10.28"
+    ansible_eth0.ipv4.address == "10.0.1.12"
+
+## Desactivamos demonio HTTPD del nodo master,
+## para que no interfiera con el controlador
+## haproxy-ingress
 
 - name: Desactivar HTTPD en kubemaster
   become: yes
@@ -74,13 +101,18 @@
     state: stopped
     enabled: no
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Pemitimos que el nodo master pueda programar pods 
+## que no sean del sistema
 
 - name: Permitir aceptar pods en k8smaster
   shell: |
     kubectl taint node k8smaster node-role.kubernetes.io/master:NoSchedule-
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Copiamos los datos necesarios para instalar rook en el nodo master
 
 - name: Sincronizar datos para rook en k8s
   copy:
@@ -88,34 +120,38 @@
     dest: /root/
     directory_mode: yes
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Instalamos en el cluster de kubernetes, el cluster rook-ceph
 
 - name: Instalar rook con Ceph en el cluster k8s - fase 1
   shell: |
     kubectl create -f /root/files/crds.yaml -f /root/files/common.yaml -f /root/files/operator.yaml 
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
 
 - name: Instalar rook con Ceph en el cluster k8s - fase 2
   shell: |
     kubectl create -f /root/files/cluster.yaml
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
 
 - name: Instalar Toolbox de Rook
   shell: |
     kubectl create -f /root/files/toolbox.yaml
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"  
+    ansible_eth0.ipv4.address == "10.0.1.10"  
 
 - name: Instalar rook con Ceph en el cluster k8s - fase Storageclass
   shell: |
     kubectl create -f /root/files/storageclass.yaml
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+## Instalamos el controlador haproxy-ingress en el cluster.
 
 - name: Instalar Haproxy-Ingress 
   shell: |
     kubectl create -f /root/files/haproxy-ingress.yaml
   when:
-    ansible_ens18.ipv4.address == "172.16.10.26"
+    ansible_eth0.ipv4.address == "10.0.1.10"
