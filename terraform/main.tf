@@ -7,6 +7,8 @@ terraform {
   }
 }
 
+## Configuración de credenciales de Azure
+
 provider "azurerm" {
   features {}
   subscription_id = "e8b5381e-607b-4ada-ba0a-31fbdf254f1d"
@@ -14,6 +16,8 @@ provider "azurerm" {
   client_secret   = "W5kl-JWZJL5dB8PSyRg_xVZPx1QfJupKl-"
   tenant_id       = "899789dc-202f-44b4-8472-a6d40f9eb440"
 }
+
+## Crear Grupo de recursos que contendrá todos los recursos, vms, nics, sotorages, etc..
 
 resource "azurerm_resource_group" "rg" {
     name     =  "k8s_rg"
@@ -24,6 +28,8 @@ resource "azurerm_resource_group" "rg" {
     }
 
 }
+
+## Creando la cuneta de almacenamiento, que contendrá los discos de cada VM
 
 resource "azurerm_storage_account" "stAccount" {
     name                     = "staccountcp2dsc" 
