@@ -1,6 +1,6 @@
 clustervms: 
-  - { host: 'k8smaster', ipex: '23.97.177.6', ipin: '10.0.1.10' }
-  - { host: 'k8sworker01', ipex: '104.40.222.70', ipin: '10.0.1.11' }
-  - { host: 'k8sworker02', ipex: '51.144.237.2', ipin: '10.0.1.12' }
+  - { host: 'k8smaster', ipex: '13.81.62.204', ipin: '10.0.1.10' }
+  - { host: 'k8sworker01', ipex: '13.81.58.251', ipin: '10.0.1.11' }
+  - { host: 'k8sworker02', ipex: '13.81.58.234', ipin: '10.0.1.12' }
 
 pod_cidr: '172.16.0.0/16'

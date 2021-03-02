@@ -1,4 +1,4 @@
 [k8svms]
-k8smaster     ansible_ssh_host=23.97.177.6 ansible_ssh_user=k8s
-k8sworker01   ansible_ssh_host=104.40.222.70 ansible_ssh_user=k8s
-k8sworker02   ansible_ssh_host=51.144.237.2 ansible_ssh_user=k8s
+k8smaster     ansible_ssh_host=13.81.221.121 ansible_ssh_user=k8s
+k8sworker01   ansible_ssh_host=13.80.249.246 ansible_ssh_user=k8s
+k8sworker02   ansible_ssh_host=13.81.216.209 ansible_ssh_user=k8s

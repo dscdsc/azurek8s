@@ -9,7 +9,7 @@ k8sinit:
 game:
 	ansible-playbook -i hosts game-init.yml
 reset:
-	ansible-playbook -i hosts reset-init.yml
+	ansible-playbook -i hosts reset-k8s.yml
 all:
 	ansible-playbook -i hosts config-init.yml
 	ansible-playbook -i hosts install-init.yml

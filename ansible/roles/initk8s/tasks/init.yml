@@ -136,7 +136,13 @@
   when:
     ansible_eth0.ipv4.address == "10.0.1.10"
 
-- name: Instalar Toolbox de Rook
+- name: Instalar rook con Ceph en el cluster k8s - Crear Keyring
+  shell: |
+    kubectl -n rook-ceph create secret generic --type kubernetes.io/rook rook-ceph-crash-collector-keyring
+  when:
+    ansible_eth0.ipv4.address == "10.0.1.10"
+
+- name: Instalar rook con Ceph en el cluster k8s - Instalar Toolbox de Rook
   shell: |
     kubectl create -f /root/files/toolbox.yaml
   when:
