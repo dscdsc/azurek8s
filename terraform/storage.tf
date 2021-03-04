@@ -13,7 +13,7 @@ resource "azurerm_managed_disk" "k8sMasterDisk" {
 resource "azurerm_virtual_machine_data_disk_attachment" "k8sMasterAttach" {
   managed_disk_id    = azurerm_managed_disk.k8sMasterDisk.id
   virtual_machine_id = azurerm_linux_virtual_machine.k8sMaster.id
-  lun                = "10"
+  lun                = "20"
   caching            = "ReadWrite"
 }
 
@@ -32,7 +32,7 @@ resource "azurerm_managed_disk" "k8sWorker1Disk" {
 resource "azurerm_virtual_machine_data_disk_attachment" "k8sWorker1Attach" {
   managed_disk_id    = azurerm_managed_disk.k8sWorker1Disk.id
   virtual_machine_id = azurerm_linux_virtual_machine.k8sWorker1.id
-  lun                = "10"
+  lun                = "20"
   caching            = "ReadWrite"
 }
 
@@ -51,6 +51,6 @@ resource "azurerm_managed_disk" "k8sWorker2Disk" {
 resource "azurerm_virtual_machine_data_disk_attachment" "k8sWorker2Attach" {
   managed_disk_id    = azurerm_managed_disk.k8sWorker2Disk.id
   virtual_machine_id = azurerm_linux_virtual_machine.k8sWorker2.id
-  lun                = "10"
+  lun                = "20"
   caching            = "ReadWrite"
 }
