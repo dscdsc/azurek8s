@@ -103,16 +103,6 @@
   when:
     ansible_eth0.ipv4.address == "10.0.1.10"
 
-- name: Aplicar reglas de acceso entre ips del mismo rango
-    become: yes
-    shell: |
-      iptables -A INPUT -s 10.0.1.0/24 -j ACCEPT
-      iptables -A OUTPUT -s 10.0.1.0/24 -j ACCEPT
-
-- name: Pausar 15 min para que se despliegue del cluster
-  pause:
-    minutes: 15
-
 ## Pemitimos que el nodo master pueda programar pods 
 ## que no sean del sistema
 
@@ -152,11 +142,11 @@
   when:
     ansible_eth0.ipv4.address == "10.0.1.10"
 
-# - name: Instalar rook con Ceph en el cluster k8s - Instalar Toolbox de Rook
-#   shell: |
-#     kubectl create -f /root/files/toolbox.yaml
-#   when:
-#     ansible_eth0.ipv4.address == "10.0.1.10"  
+- name: Instalar rook con Ceph en el cluster k8s - Instalar Toolbox de Rook
+  shell: |
+    kubectl create -f /root/files/toolbox.yaml
+  when:
+    ansible_eth0.ipv4.address == "10.0.1.10"  
 
 - name: Instalar rook con Ceph en el cluster k8s - fase Storageclass
   shell: |

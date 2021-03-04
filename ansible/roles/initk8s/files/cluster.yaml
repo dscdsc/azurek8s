@@ -19,9 +19,9 @@ spec:
     # v13 is mimic, v14 is nautilus, and v15 is octopus.
     # RECOMMENDATION: In production, use a specific version tag instead of the general v14 flag, which pulls the latest release and could result in different
     # versions running within the cluster. See tags available at https://hub.docker.com/r/ceph/ceph/tags/.
-    # If you want to be more precise, you can always use a timestamp tag such ceph/ceph:v15.2.8-20201217
+    # If you want to be more precise, you can always use a timestamp tag such ceph/ceph:v15.2.9-20201217
     # This tag might not contain a new Ceph version, just security fixes from the underlying operating system, which will reduce vulnerabilities
-    image: ceph/ceph:v15.2.8
+    image: ceph/ceph:v15.2.9
     # Whether to allow unsupported versions of Ceph. Currently `nautilus` and `octopus` are supported.
     # Future versions such as `pacific` would require this to be set to `true`.
     # Do not set to true in production.
@@ -78,7 +78,7 @@ spec:
     # enable host networking
     #provider: host
     # EXPERIMENTAL: enable the Multus network provider
-    #provider: host
+    #provider: multus
     #selectors:
       # The selector keys are required to be `public` and `cluster`.
       # Based on the configuration, the operator will do the following:
@@ -190,8 +190,8 @@ spec:
 #    mgr: rook-ceph-mgr-priority-class
   storage: # cluster level storage configuration and selection
     useAllNodes: true
-    useAllDevices: false
-    deviceFilter: "^sdc"
+    useAllDevices: true
+    #deviceFilter:
     config:
       # crushRoot: "custom-root" # specify a non-default root label for the CRUSH map
       # metadataDevice: "md0" # specify a non-rotational storage so ceph-volume will use it as block db device of bluestore.
@@ -202,13 +202,9 @@ spec:
 # Individual nodes and their config can be specified as well, but 'useAllNodes' above must be set to false. Then, only the named
 # nodes below will be used as storage resources.  Each node's 'name' field should match their 'kubernetes.io/hostname' label.
 #    nodes:
-#    - name: "172.16.10.27"
+#    - name: "172.17.4.201"
 #      devices: # specific devices to use for storage can be specified for each node
 #      - name: "sdb"
-#    - name: "172.16.10.28"
-#      devices: # specific devices to use for storage can be specified for each node
-#      - name: "sdb"
-
 #      - name: "nvme01" # multiple osds can be created on high performance devices
 #        config:
 #          osdsPerDevice: "5"
