@@ -30,16 +30,16 @@
 
 ## Instalamos la red Calico para el cluster de kubernetes
 
-- name: Instalar calico para k8s - copia fichero
+- name: Instalar Canal para k8s - copia fichero
   template:
-    src: calico.yml.j2
-    dest: /root/calico.yml
+    src: canal.yaml.j2
+    dest: /root/canal.yml
   when:
     ansible_eth0.ipv4.address == "10.0.1.10"
 
-- name: Instalar calico para k8s
+- name: Instalar Canal para k8s
   shell: |
-    kubectl apply -f /root/calico.yml
+    kubectl apply -f /root/canal.yml
   when:
     ansible_eth0.ipv4.address == "10.0.1.10"
 
